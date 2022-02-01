@@ -1,0 +1,33 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{fit}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{X}\PYG{p}{,} \PYG{n}{y}\PYG{p}{):}
+    \PYG{n}{n}\PYG{p}{,} \PYG{n}{d} \PYG{o}{=} \PYG{n}{X}\PYG{o}{.}\PYG{n}{shape}
+
+    \PYG{c+c1}{\PYGZsh{} Compute the number of class labels}
+    \PYG{n}{k} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{num\PYGZus{}classes}
+
+    \PYG{c+c1}{\PYGZsh{} Compute the probability of each class i.e p(y==c), aka \PYGZdq{}baseline \PYGZhy{}ness\PYGZdq{}}
+    \PYG{n}{counts} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{bincount}\PYG{p}{(}\PYG{n}{y}\PYG{p}{)}
+    \PYG{n}{p\PYGZus{}y} \PYG{o}{=} \PYG{n}{counts} \PYG{o}{/} \PYG{n}{n}
+
+    \PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}YOUR CODE HERE FOR Q3.3\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+
+    \PYG{c+c1}{\PYGZsh{} Compute the conditional probabilities i.e.}
+    \PYG{c+c1}{\PYGZsh{} p(x\PYGZus{}ij=1 | y\PYGZus{}i==c) as p\PYGZus{}xy[j, c]}
+    \PYG{c+c1}{\PYGZsh{} p(x\PYGZus{}ij=0 | y\PYGZus{}i==c) as 1 \PYGZhy{} p\PYGZus{}xy[j, c]}
+    \PYG{n}{p\PYGZus{}xy} \PYG{o}{=} \PYG{l+m+mf}{0.5} \PYG{o}{*} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ones}\PYG{p}{((}\PYG{n}{d}\PYG{p}{,} \PYG{n}{k}\PYG{p}{))}
+    \PYG{n}{xy} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{X}\PYG{p}{,} \PYG{n}{y}\PYG{p}{[:,}\PYG{k+kc}{None}\PYG{p}{],} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{1}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} For each class, calculate the p(x\PYGZus{}ij=1|y\PYGZus{}i==b)}
+    \PYG{k}{for} \PYG{n}{b} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{num\PYGZus{}classes}\PYG{p}{):}
+        \PYG{c+c1}{\PYGZsh{} Find out where y\PYGZus{}i==b}
+        \PYG{n}{indices} \PYG{o}{=} \PYG{p}{(}\PYG{n}{xy}\PYG{p}{[:,} \PYG{n}{d}\PYG{p}{]}\PYG{o}{==}\PYG{n}{b}\PYG{p}{)}\PYG{o}{.}\PYG{n}{nonzero}\PYG{p}{()}
+        \PYG{c+c1}{\PYGZsh{} summarize x\PYGZus{}ij=1 for each word}
+        \PYG{n}{n\PYGZus{}ij} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{(}\PYG{n}{X}\PYG{p}{[}\PYG{n}{indices}\PYG{p}{],} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{)}
+        \PYG{n}{n\PYGZus{}b} \PYG{o}{=} \PYG{n}{X}\PYG{p}{[}\PYG{n}{indices}\PYG{p}{]}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
+        \PYG{n}{p\PYGZus{}xy}\PYG{p}{[:,} \PYG{n}{b}\PYG{p}{]} \PYG{o}{=} \PYG{n}{n\PYGZus{}ij} \PYG{o}{/} \PYG{n}{n\PYGZus{}b}
+
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{p\PYGZus{}xy}\PYG{p}{)}
+
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{p\PYGZus{}y} \PYG{o}{=} \PYG{n}{p\PYGZus{}y}
+    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{p\PYGZus{}xy} \PYG{o}{=} \PYG{n}{p\PYGZus{}xy}
+\end{Verbatim}

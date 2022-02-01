@@ -1,0 +1,19 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{fit}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{X}\PYG{p}{,} \PYG{n}{y}\PYG{p}{):}
+    \PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}YOUR CODE FOR Q3.4\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{n}\PYG{p}{,}\PYG{n}{d} \PYG{o}{=} \PYG{n}{X}\PYG{o}{.}\PYG{n}{shape}
+    \PYG{n}{k} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{num\PYGZus{}classes}
+
+    \PYG{c+c1}{\PYGZsh{} append k [1,1,...1] and k [0,0...0] after original X}
+    \PYG{n}{X\PYGZus{}append} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ones}\PYG{p}{((}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{beta} \PYG{o}{*} \PYG{n}{k}\PYG{p}{,} \PYG{n}{d}\PYG{p}{),} \PYG{n}{dtype}\PYG{o}{=}\PYG{n+nb}{int}\PYG{p}{)}
+    \PYG{n}{X\PYGZus{}append} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{X\PYGZus{}append}\PYG{p}{,} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{((}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{beta} \PYG{o}{*} \PYG{n}{k}\PYG{p}{,} \PYG{n}{d}\PYG{p}{)),} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} append 2k [0,1,2,3] after original y}
+    \PYG{n}{y\PYGZus{}append} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{repeat}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{([}\PYG{n}{i} \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{k}\PYG{p}{)]),} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{beta} \PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{.}\PYG{n}{flatten}\PYG{p}{()}
+
+    \PYG{n}{X} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{X}\PYG{p}{,} \PYG{n}{X\PYGZus{}append}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{)}
+    \PYG{n}{y} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{y}\PYG{p}{,} \PYG{n}{y\PYGZus{}append}\PYG{p}{,} \PYG{n}{axis}\PYG{o}{=}\PYG{l+m+mi}{0}\PYG{p}{)}
+
+    \PYG{n+nb}{super}\PYG{p}{(}\PYG{n}{NaiveBayesLaplace}\PYG{p}{,} \PYG{n+nb+bp}{self}\PYG{p}{)}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{(}\PYG{n}{X}\PYG{p}{,} \PYG{n}{y}\PYG{p}{)}
+
+\end{Verbatim}

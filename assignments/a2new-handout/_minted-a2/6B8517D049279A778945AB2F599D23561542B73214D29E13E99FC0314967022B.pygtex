@@ -1,0 +1,20 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{q1}\PYG{p}{():}
+    \PYG{n}{dataset} \PYG{o}{=} \PYG{n}{load\PYGZus{}dataset}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}citiesSmall.pkl\PYGZdq{}}\PYG{p}{)}
+
+    \PYG{n}{X} \PYG{o}{=} \PYG{n}{dataset}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}X\PYGZdq{}}\PYG{p}{]}
+    \PYG{n}{y} \PYG{o}{=} \PYG{n}{dataset}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}y\PYGZdq{}}\PYG{p}{]}
+    \PYG{n}{X\PYGZus{}test} \PYG{o}{=} \PYG{n}{dataset}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}Xtest\PYGZdq{}}\PYG{p}{]}
+    \PYG{n}{y\PYGZus{}test} \PYG{o}{=} \PYG{n}{dataset}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}ytest\PYGZdq{}}\PYG{p}{]}
+    \PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}YOUR CODE HERE FOR Q1\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{k}{for} \PYG{n}{k} \PYG{o+ow}{in} \PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{l+m+mi}{3}\PYG{p}{,}\PYG{l+m+mi}{10}\PYG{p}{]:}
+        \PYG{n}{model} \PYG{o}{=} \PYG{n}{KNN}\PYG{p}{(}\PYG{n}{k}\PYG{p}{)}
+        \PYG{n}{model}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{(}\PYG{n}{X}\PYG{p}{,} \PYG{n}{y}\PYG{p}{)}
+        \PYG{n}{y\PYGZus{}pred} \PYG{o}{=} \PYG{n}{model}\PYG{o}{.}\PYG{n}{predict}\PYG{p}{(}\PYG{n}{X}\PYG{p}{)}
+        \PYG{n}{training\PYGZus{}error} \PYG{o}{=}  \PYG{n}{np}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{y\PYGZus{}pred} \PYG{o}{!=} \PYG{n}{y}\PYG{p}{)}
+        \PYG{n}{test\PYGZus{}error} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{model}\PYG{o}{.}\PYG{n}{predict}\PYG{p}{(}\PYG{n}{X\PYGZus{}test}\PYG{p}{)} \PYG{o}{!=} \PYG{n}{y\PYGZus{}test}\PYG{p}{)}
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}k=\PYGZdq{}}\PYG{p}{,} \PYG{n}{k}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}: training error=\PYGZdq{}}\PYG{p}{,} \PYG{n}{training\PYGZus{}error}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}, test error=\PYGZdq{}}\PYG{p}{,} \PYG{n}{test\PYGZus{}error}\PYG{p}{)}
+        \PYG{k}{if} \PYG{p}{(}\PYG{n}{k} \PYG{o}{==} \PYG{l+m+mi}{1}\PYG{p}{):}
+            \PYG{n}{plot\PYGZus{}classifier}\PYG{p}{(}\PYG{n}{model}\PYG{p}{,} \PYG{n}{X}\PYG{p}{,} \PYG{n}{y}\PYG{p}{)}
+            \PYG{n}{plt}\PYG{o}{.}\PYG{n}{savefig}\PYG{p}{(}\PYG{n}{Path}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}..\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}figs\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}q1.pdf\PYGZdq{}}\PYG{p}{))}
+\end{Verbatim}

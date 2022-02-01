@@ -1,0 +1,36 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{class} \PYG{n+nc}{RandomForest}\PYG{p}{:}
+    \PYG{l+s+sd}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+\PYG{l+s+sd}{    YOUR CODE HERE FOR Q4}
+\PYG{l+s+sd}{    Hint: start with the constructor \PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}(), which takes the hyperparameters.}
+\PYG{l+s+sd}{    Hint: you can instantiate objects inside fit().}
+\PYG{l+s+sd}{    Make sure predict() is able to handle multiple examples.}
+\PYG{l+s+sd}{    \PYGZdq{}\PYGZdq{}\PYGZdq{}}
+    \PYG{n}{random\PYGZus{}trees} \PYG{o}{=} \PYG{p}{[]}
+
+    \PYG{k}{def} \PYG{n+nf+fm}{\PYGZus{}\PYGZus{}init\PYGZus{}\PYGZus{}}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{num\PYGZus{}trees}\PYG{p}{,} \PYG{n}{max\PYGZus{}depth}\PYG{p}{):}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{num\PYGZus{}trees} \PYG{o}{=} \PYG{n}{num\PYGZus{}trees}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{max\PYGZus{}depth} \PYG{o}{=} \PYG{n}{max\PYGZus{}depth}
+
+
+    \PYG{k}{def} \PYG{n+nf}{fit}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{X}\PYG{p}{,} \PYG{n}{y}\PYG{p}{):}
+        \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{num\PYGZus{}trees}\PYG{p}{):}
+            \PYG{n}{random\PYGZus{}tree} \PYG{o}{=} \PYG{n}{RandomTree}\PYG{p}{(}\PYG{n}{max\PYGZus{}depth}\PYG{o}{=}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{max\PYGZus{}depth}\PYG{p}{)}
+            \PYG{n}{random\PYGZus{}tree}\PYG{o}{.}\PYG{n}{fit}\PYG{p}{(}\PYG{n}{X}\PYG{p}{,} \PYG{n}{y}\PYG{p}{)}
+            \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{random\PYGZus{}trees}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{random\PYGZus{}tree}\PYG{p}{)}
+
+    \PYG{k}{def} \PYG{n+nf}{predict}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{X}\PYG{p}{):}
+        \PYG{n}{res} \PYG{o}{=} \PYG{p}{[]}
+        \PYG{n}{mode} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{(}\PYG{n}{X}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}
+
+        \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{num\PYGZus{}trees}\PYG{p}{):}
+            \PYG{n}{y\PYGZus{}pred} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{random\PYGZus{}trees}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}\PYG{o}{.}\PYG{n}{predict}\PYG{p}{(}\PYG{n}{X}\PYG{p}{)}
+            \PYG{n}{res}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{y\PYGZus{}pred}\PYG{p}{)}
+
+        \PYG{n}{res} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{(}\PYG{n}{res}\PYG{p}{)}\PYG{o}{.}\PYG{n}{transpose}\PYG{p}{()}
+        \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{X}\PYG{o}{.}\PYG{n}{shape}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]):}
+            \PYG{n}{mode}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{=} \PYG{n}{utils}\PYG{o}{.}\PYG{n}{mode}\PYG{p}{(}\PYG{n}{res}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,} \PYG{p}{:])}
+
+        \PYG{k}{return} \PYG{n}{mode}
+
+\end{Verbatim}

@@ -15,6 +15,7 @@
 \usepackage{amssymb}
 \usepackage{hyperref}
 \usepackage{minted}
+\usepackage{algorithm2e}
 
 
 \usepackage{listings}
@@ -591,6 +592,29 @@ def bar_grad(x):
   obtain by using inequalities instead of discretizing and testing equality.
   Submit your class definition code as a screenshot or using the \texttt{lstlisting} environment.
   Also submit the generated figure of the classification boundary.}
+
+  Pseudo Code:
+
+  \begin{algorithm}[hbt!]
+  \caption{Decision Stump}\label{alg:one}    
+  \KwData{feature matrix $X$, label vector $y$}
+
+  \For(){each feature $j$}{
+    \For{each threshold $t$}{
+        $y_{yes} \gets$ most common lable of objects i satisfying rule ($X_{ij} > t$)
+
+        $y_{no} \gets$ most common lable of objects i not satisfying rule ($X_{ij} \leq t$)
+
+        $\hat{y} \gets$ predictions for each object i based on the rule
+
+        $E \gets $  number of objects where $\hat{y_{i}} \neq y_i$
+
+        store rule $(j, t, y_{yes}, y_{no})$ if it has lowest $E$
+    }
+    
+}
+
+  \end{algorithm}
 
   Hint: you may want to start by copy/pasting the contents \texttt{DecisionStumpEquality} and then make modifications from there. %You can make modifications from there. % But you are asked to keep them separate rather than directly modifying the provided code so that you can keep both versions in tact and compare them.
   % Note: please keep the same variable names, as subsequent parts of this assignment rely on this!

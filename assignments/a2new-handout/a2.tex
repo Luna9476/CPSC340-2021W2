@@ -1,0 +1,609 @@
+% !TeX root = a2.tex
+%!TEX enableShellEscape = yes
+% (The above line makes atom's latex package compile with -shell-escape
+% for minted, and is just ignored by other systems.)
+\documentclass{article}
+
+\usepackage{fullpage}
+\usepackage{color}
+\usepackage{amsmath,amssymb}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{parskip}
+\usepackage{amssymb}
+\usepackage{hyperref}
+
+% Use one or the other of these for displaying code.
+% NOTE: If you get
+%  ! Package minted Error: You must invoke LaTeX with the -shell-escape flag.
+% and don't want to use minted, just comment out the next line
+\usepackage{minted} \BeforeBeginEnvironment{minted}{\begingroup\color{black}} \AfterEndEnvironment{minted}{\endgroup} \setminted{autogobble,breaklines,breakanywhere,linenos}
+
+\usepackage{listings}
+
+% Colours
+\definecolor{blu}{rgb}{0,0,1}
+\newcommand{\blu}[1]{{\textcolor{blu}{#1}}}
+\definecolor{gre}{rgb}{0,.5,0}
+\newcommand{\gre}[1]{\textcolor{gre}{#1}}
+\definecolor{red}{rgb}{1,0,0}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\definecolor{pointscolour}{rgb}{0.6,0.3,0}
+
+% answer commands
+\newcommand\ans[1]{\par\gre{Answer: #1}}
+\newenvironment{answer}{\par\begingroup\color{gre}Answer: }{\endgroup}
+\let\ask\blu
+\let\update\red
+\newenvironment{asking}{\begingroup\color{blu}}{\endgroup}
+\newcommand\pts[1]{\textcolor{pointscolour}{[#1~points]}}
+
+% Math
+\def\R{\mathbb{R}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\norm}[1]{\lVert #1 \rVert}
+\newcommand{\mat}[1]{\begin{bmatrix}#1\end{bmatrix}}
+
+% LaTeX
+\newcommand{\fig}[2]{\includegraphics[width=#1\textwidth]{#2}}
+\newcommand{\centerfig}[2]{\begin{center}\includegraphics[width=#1\textwidth]{#2}\end{center}}
+
+
+\begin{document}
+    \title{CPSC 340 Assignment 2 (see course page for due date)}
+    \author{Lu, Lei}
+    \date{}
+    \maketitle
+    \vspace{-4em}
+
+
+    \section*{Important: Submission Format \pts{5}}
+
+    Please make sure to follow the submission instructions posted on the course website.
+    \ask{We will deduct marks if the submission format is incorrect, or if you're not using \LaTeX{} and your handwriting is \emph{at all} difficult to read} -- at least these 5 points, more for egregious issues.
+    Compared to assignment 1, your name and student number are no longer necessary (though it's not a bad idea to include them just in case, especially if you're doing the assignment with a partner).
+
+
+    \section{K-Nearest Neighbours \pts{15}}
+
+    In the \emph{citiesSmall} dataset, nearby points tend to receive the same class label because they are part of the same U.S. state. For this problem, perhaps a $k$-nearest neighbours classifier might be a better choice than a decision tree. The file \emph{knn.py} has implemented the training function for a $k$-nearest neighbour classifier (which is to just memorize the data).
+
+    Fill in the \texttt{predict} function in \texttt{knn.py} so that the model file implements the $k$-nearest neighbour prediction rule.
+    You should use Euclidean distance, and may find numpy's \texttt{sort} and/or \texttt{argsort} functions useful.
+    You can also use \texttt{utils.euclidean\string_dist\string_squared}, which computes the squared Euclidean distances between all pairs of points in two matrices.
+    \begin{enumerate}
+        \item Write the \texttt{predict} function. \ask{Submit this code.} \pts{5}
+        \begin{answer}
+            \begin{minted}{python}
+            def q1():
+                dataset = load_dataset("citiesSmall.pkl")
+
+                X = dataset["X"]
+                y = dataset["y"]
+                X_test = dataset["Xtest"]
+                y_test = dataset["ytest"]
+                """YOUR CODE HERE FOR Q1"""
+                for k in [1,3,10]:
+                    model = KNN(k)
+                    model.fit(X, y)
+                    y_pred = model.predict(X)
+                    training_error =  np.mean(y_pred != y)
+                    test_error = np.mean(model.predict(X_test) != y_test)
+                    print("k=", k, ": training error=", training_error, ", test error=", test_error)
+                    if (k == 1):
+                        plot_classifier(model, X, y)
+                        plt.savefig(Path("..", "figs", "q1.pdf"))              
+            \end{minted}
+        \end{answer}
+        \newpage
+        \item \ask{Report the training and test error} obtained on the \emph{citiesSmall} dataset for $k=1$, $k=3$, and $k=10$. \emph{Optionally}, try running a decision tree on this same train/test split; which gets better test accuracy? \pts{4}
+        \begin{answer}
+            \begin{itemize}
+                \item k=1: training error is 0.0, test error is 0.0645
+                \item k=3: training error is 0.0275, test error is 0.066
+                \item k=10: training error is 0.0725, test error is 0.097
+            \end{itemize}
+        \end{answer}
+        \item Generate a plot with \texttt{utils.plot\_classifier} on the \emph{citiesSmall} dataset (plotting the training points) for $k=1$, using your implementation of kNN. \ask{Include the plot here.} To see if your implementation makes sense, you might want to check against the plot using \texttt{sklearn.neighbors.KNeighborsClassifier}. Remember that the assignment 1 code had examples of plotting with this function and saving the result, if that would be helpful. \pts{2}
+        \centerfig{0.7}{./figs/q1.pdf}
+        \item Why is the training error $0$ for $k=1$? \pts{2}
+        \ans{Because the nearest neighbour is the point itself, so when training, we always get the labeld y as predict y if k=1}
+        \item Recall that we want to choose hyper-parameters so that the test error is (hopefully) minimized. How would you choose $k$? \pts{2}
+        \ans{We should split data into training and validation set, and use k which produce minimized error for validation set.}
+    \end{enumerate}
+
+    \clearpage
+    \section{Picking $k$ in kNN \pts{15}}
+    The file \texttt{data/ccdata.pkl} contains a subset of \href{https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&SDDS=2620}{Statistics Canada's 2019 Survey of Financial Security}; we're predicting whether a family regularly carries credit card debt, based on a bunch of demographic and financial information about them. (You might imagine social science researchers wanting to do something like this if they don't have debt information available -- or various companies wanting to do it for less altruistic reasons.) If you're curious what the features are, you can look at the \texttt{'feat\_descs'} entry in the dataset dictionary.
+
+    Anyway, now that we have our kNN algorithm working,\footnote{If you haven't finished the code for question 1, or if you'd just prefer a slightly faster implementation, you can use scikit-learn's \texttt{KNeighborsClassifier} instead. The \texttt{fit} and \texttt{predict} methods are the same; the only difference for our purposes is that \texttt{KNN(k=3)} becomes \texttt{KNeighborsClassifier(n\_neighbors=3)}.} let's try choosing $k$ on this data!
+
+    \begin{enumerate}
+        \item Remember the golden rule: we don't want to look at the test data when we're picking $k$. Inside the \texttt{q2()} function of \texttt{main.py}, implement 10-fold cross-validation, evaluating on the \texttt{ks} set there (1, 5, 9, \dots, 29), and store the \emph{mean} accuracy across folds for each $k$ into a variable named \texttt{cv\_accs}.
+
+        Specifically, make sure you test on the first 10\% of the data after training on the remaining 90\%, then test on 10\% to 20\% and train on the remainder, etc -- don't shuffle (so your results are consistent with ours; the data is already in random order). Implement this yourself, don't use scikit-learn or any other existing implementation of splitting. There are lots of ways you could do this, but one reasonably convenient way is to create a \href{https://numpy.org/doc/stable/user/basics.indexing.html#boolean-or-mask-index-arrays}{numpy ``mask'' array}, maybe using \texttt{np.ones(n, dtype=bool)} for an all-\texttt{True} array of length \texttt{n}, and then setting the relevant entries to \texttt{False}. It also might be helpful to know that \texttt{\textasciitilde ary} flips a boolean array (\texttt{True} to \texttt{False} and vice-versa).
+
+        \ask{Submit this code}, following the general submission instructions to include your code in your results file. \pts{5}
+        \begin{minted}{python}
+def q2():
+    dataset = load_dataset("ccdebt.pkl")
+    X = dataset["X"]
+    y = dataset["y"]
+    X_test = dataset["Xtest"]
+    y_test = dataset["ytest"]
+
+    ks = list(range(1, 30, 4))
+
+    """YOUR CODE HERE FOR Q2"""
+    n = y.shape[0]
+
+    # validation errors for different ks
+    cv_accs = []
+    for k in ks:
+        validation_error = np.zeros(10)
+        for i in range(10):
+            mask = np.ones(n, dtype=bool)
+            mask[int(0.1*i*n):int(0.1*(i+1)*n)] = False
+            X_validate = X[~mask, :]
+            y_validate = y[~mask]
+            X_train = X[mask, :]
+            y_train = y[mask]
+            model = KNeighborsClassifier(n_neighbors=k)
+            model.fit(X_train, y_train)
+            validation_error[i] = np.mean(model.predict(X_validate) != y_validate)
+        cv_accs.append(np.mean(validation_error))
+    
+    # test errors for different ks
+    test_errors = []
+    for k in ks:
+        model = KNeighborsClassifier(n_neighbors=k)
+        model.fit(X, y)
+        test_error = np.mean(model.predict(X_test) != y_test)
+        test_errors.append(test_error)
+    print(cv_accs)
+    print(test_errors)
+    plt.plot(ks, cv_accs, label='cross validation' )
+    plt.plot(ks, test_errors, label='test')
+    plt.xlabel("k")
+    plt.ylabel("error")
+    plt.legend()
+    plt.savefig(Path("..", "figs", "q2_1.pdf"))
+        \end{minted}
+        
+        \newpage
+        \item The point of cross-validation is to get a sense of what the test error for a particular value of $k$ would be. Implement, similarly to the code you wrote for question 1.2, a loop to compute the test accuracy for each value of $k$ above. \ask{Submit a plot the cross-validation and test accuracies as a function of $k$.} Make sure your plot has axis labels and a legend. \pts{5}
+
+        \centerfig{0.7}{./figs/q2_1.pdf}
+
+        \item Which $k$ would cross-validation choose in this case? Which $k$ has the best test accuracy? Would the cross-validation $k$ do okay (qualitatively) in terms of test accuracy? \pts{2}
+
+        \ans{For cross-validation, we should choose k=17; k=9 has the best test accuracy. It's okay to choose k = 17 based on the cross-validation error because both the test error and cross-validation error are not high.}
+
+        \newpage
+        \item Separately, \ask{submit a plot of the training error as a function of $k$. How would the $k$ with best training error do in terms of test error, qualitatively?} \pts{3}
+        \centerfig{0.7}{./figs/q2_2.pdf}
+        \ans{when k=1, we get the lowest training error 0, however, we get the largest test error when k=1 }
+    \end{enumerate}
+
+
+
+    \clearpage
+    \section{Na\"ive Bayes \pts{17}}
+
+    In this section we'll implement Na\"ive Bayes, a very fast classification method that is often surprisingly accurate for text data with simple representations like bag of words.
+
+
+    \subsection{Na\"ive Bayes by Hand \pts{5}}
+
+    Consider the dataset below, which has $10$ training examples and $3$ features:
+    \[
+    X = \begin{bmatrix}
+        0 & 0 & 1\\
+        0 & 1 & 1\\
+        0 & 1 & 1\\
+        1 & 1 & 0\\
+        0 & 1 & 0\\
+        0 & 1 & 1\\
+        0 & 1 & 0\\
+        1 & 1 & 0\\
+        1 & 0 & 0\\
+        0 & 0 & 0
+    \end{bmatrix},
+    \quad y = \begin{bmatrix}
+        \text{spam}\\
+        \text{spam}\\
+        \text{spam}\\
+        \text{spam}\\
+        \text{spam}\\
+        \text{spam}\\
+        \text{not spam}\\
+        \text{not spam}\\
+        \text{not spam}\\
+        \text{not spam}
+    \end{bmatrix}.
+    \]
+    The feature in the first column is $<$your name$>$ (whether the e-mail contained your name), in the second column is ``lottery'' (whether the e-mail contained this word), and the third column is ``Venmo'' (whether the e-mail contained this word).
+    Suppose you believe that a naive Bayes model would be appropriate for this dataset, and you want to classify the following test example:
+    \[
+    \hat{x} = \begin{bmatrix}1 & 1 & 0\end{bmatrix}.
+    \]
+
+    \subsubsection{Prior probabilities \pts{1}}
+    \ask{Compute the estimates of the class prior probabilities, which I also called the ``baseline spam-ness'' in class.} (you don't need to show any work):
+    \begin{itemize}
+        \item $\Pr(\text{spam})$.
+        \ans{$\Pr(\text{spam}) = \frac{3}{5}$}
+        \item $\Pr(\text{not spam})$.
+        \ans{$\Pr(\text{not spam}) = \frac{2}{5}$}
+    \end{itemize}
+
+    \subsubsection{Conditional probabilities \pts{1}}
+
+    \ask{Compute the estimates of the 6 conditional probabilities required by Na\"ive Bayes for this example}  (you don't need to show any work):
+    \begin{itemize}
+        \item $\Pr(\text{$<$your name$>$} = 1  \mid \text{spam})$.
+        \ans{$\Pr(\text{$<$your name$>$} = 1  \mid \text{spam}) = \frac{1}{6}$}
+        \item $\Pr(\text{lottery} = 1 \mid \text{spam})$.
+        \ans{$\Pr(\text{lottery} = 1 \mid \text{spam}) = \frac{5}{6}$}
+        \item $\Pr(\text{Venmo} = 0  \mid \text{spam})$.
+        \ans{$\Pr(\text{Venmo} = 0  \mid \text{spam}) = \frac{1}{3}$}
+        \item $\Pr(\text{$<$your name$>$} = 1  \mid \text{not spam})$.
+        \ans{$\Pr(\text{$<$your name$>$} = 1  \mid \text{not spam}) = \frac{1}{2} $}
+        \item $\Pr(\text{lottery} = 1  \mid \text{not spam})$.
+        \ans{$\Pr(\text{lottery} = 1  \mid \text{not spam}) = \frac{1}{2} $}
+        \item $\Pr(\text{Venmo} = 0  \mid \text{not spam})$.
+        \ans{$\Pr(\text{Venmo} = 0  \mid \text{not spam}) = 1$}
+    \end{itemize}
+
+    \subsubsection{Prediction \pts{2}}
+
+
+    \ask{Under the naive Bayes model and your estimates of the above probabilities, what is the most likely label for the test example? \textbf{(Show your work.)}}
+    \begin{answer}\\
+        \begin{align*}
+            \Pr(\text{spam}\mid \text{$<$your name$>$=1}, \text{lottery}=1, \text{Venmo}=0) \propto \Pr(\text{$<$your name$>$=1}, \text{lottery}=1, \text{Venmo}=0 \mid \text{spam})\Pr(\text{spam})\\
+            \approx \Pr(\text{$<$your name$>$=1} \mid \text{spam}) \Pr(\text{lottery}=1 \mid \text{spam}) \Pr(\text{Venmo}=0 \mid \text{spam}) \Pr(\text{spam})\\
+            = (\frac{1}{6})(\frac{5}{6})(\frac{1}{3})(\frac{3}{5})\\
+            =\frac{1}{36}
+        \end{align*}
+        \begin{align*}
+            \Pr(\neg \text{spam}\mid\text{$<$your name$>$=1}, \text{lottery}=1, \text{Venmo}=0)\propto \Pr(\text{$<$your name$>$=1}, \text{lottery}=1, \text{Venmo}=0 \mid \neg\text{spam})\Pr(\neg\text{spam})\\
+            \approx \Pr(\text{$<$your name$>$=1} \mid \neg\text{spam}) \Pr(\text{lottery}=1 \mid \neg\text{spam}) \Pr(\text{Venmo}=0 \mid \neg\text{spam}) \Pr(\neg\text{spam})\\
+            = (\frac{1}{2})(\frac{1}{2})(1)(\frac{2}{5})\\
+            = \frac{1}{10}
+        \end{align*}
+
+        Since $\Pr(\text{spam}\mid \text{$<$your name$>$=1}, \text{lottery}=1, \text{Venmo}=0) <  \Pr(\neg \text{spam}\mid\text{$<$your name$>$=1}, \text{lottery}=1, \text{Venmo}=0)$,
+        we can predict the test example as "not spam".
+    \end{answer}
+
+    \subsubsection{Simulating Laplace Smoothing with Data \pts{1}}
+    \label{laplace.conceptual}
+
+    One way to think of Laplace smoothing is that you're augmenting the training set with extra counts. Consider the estimates of the conditional probabilities in this dataset when we use Laplace smoothing (with $\beta = 1$).
+    \ask{Give a set of extra training examples where, if they were included in the training set, the ``plain'' estimation method (with no Laplace smoothing) would give the same estimates of the conditional probabilities as using the original dataset with Laplace smoothing.}
+    Present your answer in a reasonably easy-to-read format, for example the same format as the data set at the start of this question.
+
+    \begin{answer}
+        \[
+        X_\beta = \begin{bmatrix}
+            0 & 0 & 0\\
+            0 & 0 & 0\\
+            1 & 1 & 1\\
+            1 & 1 & 1
+        \end{bmatrix},
+        \quad y_\beta = \begin{bmatrix}
+            \text{spam}\\
+            \text{not spam}\\
+            \text{not spam}\\
+            \text{spam}
+        \end{bmatrix}
+        \]
+    \end{answer}
+
+    \subsection{Exploring Bag-of-Words \pts{2}}
+
+    If you run \texttt{python main.py 3.2}, it will load the following dataset:
+    \begin{enumerate}
+        \item \texttt{X}: A binary matrix. Each row corresponds to a newsgroup post, and each column corresponds to whether a particular word was used in the post. A value of $1$ means that the word occured in the post.
+        \item \texttt{wordlist}: The set of words that correspond to each column.
+        \item \texttt{y}: A vector with values $0$ through $3$, with the value corresponding to the newsgroup that the post came from.
+        \item \texttt{groupnames}: The names of the four newsgroups.
+        \item \texttt{Xvalidate} and \texttt{yvalidate}: the word lists and newsgroup labels for additional newsgroup posts.
+    \end{enumerate}
+    \ask{Answer the following}:
+    \begin{enumerate}
+        \item Which word corresponds to column 73 of $X$? (This is index 72 in Python.)
+        \ans{"question"}
+        \item Which words are present in training example 803 (Python index 802)?
+        \ans{'case', 'children', 'health', 'help', 'problem', 'program'}
+        \item Which newsgroup name does training example 803 come from?
+        \ans{talk.*}
+    \end{enumerate}
+
+    \subsection{Na\"ive Bayes Implementation \pts{4}}
+
+    If you run \texttt{python main.py 3.3}
+    it will load the newsgroups dataset, fit a basic naive Bayes model and report the validation error.
+
+    The \texttt{predict()} function of the naive Bayes classifier is already implemented.
+    However, in \texttt{fit()}
+    the calculation of the variable \texttt{p\_xy} is incorrect
+    (right now, it just sets all values to $1/2$).
+    \ask{Modify this function so that \texttt{p\_xy} correctly
+        computes the conditional probabilities of these values based on the
+        frequencies in the data set. Submit your code. Report the training and validation errors that you obtain.}
+    \begin{answer}
+        Training error: 0.200, validation error: 0.188
+        \begin{minted}{python}
+    def fit(self, X, y):
+        n, d = X.shape
+
+        # Compute the number of class labels
+        k = self.num_classes
+
+        # Compute the probability of each class i.e p(y==c), aka "baseline -ness"
+        counts = np.bincount(y)
+        p_y = counts / n
+
+        """YOUR CODE HERE FOR Q3.3"""
+
+        # Compute the conditional probabilities i.e.
+        # p(x_ij=1 | y_i==c) as p_xy[j, c]
+        # p(x_ij=0 | y_i==c) as 1 - p_xy[j, c]
+        p_xy = 0.5 * np.ones((d, k))
+        xy = np.append(X, y[:,None], axis=1)
+
+        # For each class, calculate the p(x_ij=1|y_i==b)
+        for b in range(self.num_classes):
+            # Find out where y_i==b
+            indices = (xy[:, d]==b).nonzero()
+            # summarize x_ij=1 for each word
+            n_ij = np.sum(X[indices], axis=0)
+            n_b = X[indices].shape[0]
+            p_xy[:, b] = n_ij / n_b
+
+        print(p_xy)
+
+        self.p_y = p_y
+        self.p_xy = p_xy
+        \end{minted}
+    \end{answer}
+    
+
+    \subsection{Laplace Smoothing Implementation \pts{4}}
+
+    Laplace smoothing is one way to prevent failure cases of Na\"ive Bayes based on counting. Recall what you know from lecture to implement Laplace smoothing to your Na\"ive Bayes model.
+    \begin{itemize}
+        \item Modify the \texttt{NaiveBayesLaplace} class provided in \texttt{naive\_bayes.py} and write its \texttt{fit()} method to implement Laplace smoothing. \ask{Submit this code.}
+        \begin{answer}
+            \begin{minted}{python}
+    def fit(self, X, y):
+        """YOUR CODE FOR Q3.4"""
+        n,d = X.shape
+        k = self.num_classes
+
+        # append k [1,1,...1] and k [0,0...0] after original X
+        X_append = np.ones((self.beta * k, d), dtype=int)
+        X_append = np.append(X_append, np.zeros((self.beta * k, d)), axis=0)
+
+        # append 2k [0,1,2,3] after original y
+        y_append = np.repeat(np.array([i for i in range(k)]), self.beta *2).flatten()
+
+        X = np.append(X, X_append, axis=0)
+        y = np.append(y, y_append, axis=0)
+
+        super(NaiveBayesLaplace, self).fit(X, y)
+           
+            \end{minted}
+        \end{answer}
+        \item Using the same data as the previous section, fit Na\"ive Bayes models with \textbf{and} without Laplace smoothing to the training data. Use $\beta=1$ for Laplace smoothing. For each model, look at $p(x_{ij} = 1 \ | \ y_i = 0)$ across all $j$ values (i.e. all features) in both models. \ask{Do you notice any difference? Explain.}
+        \ans{There is no zero value in the result of laplace model, since we manually add 1s and 0s for all 4 classes}
+        \item One more time, fit a Na\"ive Bayes model with Laplace smoothing using $\beta=10000$. Look at $p(x_{ij} = 1 \ | \ y_i = 0)$. \ask{Do these numbers look like what you expect? Explain.}
+        \ans{The values for $p(x_{ij} = 1 \ | \ y_i = 0)$ is much larger in the laplace model than the Na\"ive Bayes model}
+    \end{itemize}
+
+    \subsection{Runtime of Na\"ive Bayes for Discrete Data \pts{2}}
+
+    For a given training example $i$, the predict function in the provided code computes the quantity
+    \[
+    p(y_i \mid x_i) \propto p(y_i)\prod_{j=1}^d p(x_{ij} \mid y_i),
+    \]
+    for each class $y_i$ (and where the proportionality constant is not relevant). For many problems, a lot of the $p(x_{ij} \mid y_i)$ values may be very small. This can cause the above product to underflow. The standard fix for this is to compute the logarithm of this quantity and use that $\log(ab) = \log(a)+\log(b)$,
+    \[
+    \log p(y_i \mid x_i) = \log p(y_i) + \sum_{j=1}^d \log p(x_{ij} \mid y_i) + \text{(log of the irrelevant proportionality constant)} \, .
+    \]
+    This turns the multiplications into additions and thus typically would not underflow.
+    % XXX this is true, but not super relevant to the rest of the question,
+    %     which is kind of confusing to students...
+
+    Assume you have the following setup:
+    \begin{itemize}
+        \item The training set has $n$ objects each with $d$ features.
+        \item The test set has $t$ objects with $d$ features.
+        \item Each feature can have up to $c$ discrete values (you can assume $c \leq n$).
+        \item There are $k$ class labels (you can assume $k \leq n$).
+    \end{itemize}
+    You can implement the training phase of a naive Bayes classifier in this setup in $O(\update{k c d + {}} nd)$, since you only need to do a constant amount of work for each $x_{ij}$ value\update{; usually $k c \ll n$ and so this is $O(n d)$}. (You do not have to actually implement it in this way for the previous question, but you should think about how this could be done.)
+    \ask{What is the cost of classifying $t$ test examples with the model and this way of computing the predictions?}
+    \update{It's preferable to leave your answer in terms of $k$ and $c$ if relevant.}
+    \ans{For each test example, we should check $p(x_{ij} \mid y_i)$ for all $k$ possible $y$ values and $d$ features, so the cost for each test example is $O(dk)$. Since there are t test examples, the total cost should be $O(tdk)$. (\emph{DON'T know how to convert to k and c relevant})}
+
+
+    \clearpage
+    \section{Random Forests \pts{15}}
+
+    The file \texttt{vowels.pkl} contains a supervised learning dataset where we are trying to predict which of the 11 ``steady-state'' English vowels that a speaker is trying to pronounce.
+
+    You are provided with a \texttt{RandomStump} class that differs from
+    \texttt{DecisionStumpInfoGain} in that
+    it only considers $\lfloor \sqrt{d} \rfloor$ randomly-chosen features.\footnote{The notation $\lfloor x\rfloor$ means the ``floor'' of $x$, or ``$x$ rounded down''. You can compute this with \texttt{np.floor(x)} or \texttt{math.floor(x)}.}
+    You are also provided with a \texttt{RandomTree} class that is exactly the same as
+    \texttt{DecisionTree} except that it uses \texttt{RandomStump} instead of
+    \texttt{DecisionStump} and it takes a bootstrap sample of the data before fitting.
+    In other words, \texttt{RandomTree} is the entity we discussed in class, which
+    makes up a random forest.
+
+    If you run \texttt{python main.py 4} it will fit a deep \texttt{DecisionTree}
+    using the information gain splitting criterion. You will notice that the model overfits badly.
+
+
+
+
+    \begin{enumerate}
+        \item Using the provided code, evaluate the \texttt{RandomTree} model of unlimited depth. \ask{Why doesn't the random tree model have a training error of 0?} \pts{2}
+        \ans{Because the \texttt{RandomTree} model fits only the sampled training set, instead of the full training set.}
+        \item For \texttt{RandomTree}, if you set the \texttt{max\_depth} value to \texttt{np.inf}, \ask{why do the training functions terminate instead of making an infinite number of splitting rules?} \pts{2}
+        %
+        \newpage
+        \item Complete the \texttt{RandomForest} class in \texttt{random\string_tree.py}. This class takes in hyperparameters \texttt{num\string_trees} and \texttt{max\string_depth} and
+        fits \texttt{num\string_trees} random trees each with maximum depth \texttt{max\string_depth}. For prediction, have all trees predict and then take the mode. \ask{Submit this code.} \pts{5}
+        \begin{answer}
+            \begin{minted}{python}
+class RandomForest:
+    """
+    YOUR CODE HERE FOR Q4
+    Hint: start with the constructor __init__(), which takes the hyperparameters.
+    Hint: you can instantiate objects inside fit().
+    Make sure predict() is able to handle multiple examples.
+    """
+    random_trees = []
+
+    def __init__(self, num_trees, max_depth):
+        self.num_trees = num_trees
+        self.max_depth = max_depth
+
+    
+    def fit(self, X, y):
+        for i in range(self.num_trees):
+            random_tree = RandomTree(max_depth=self.max_depth)
+            random_tree.fit(X, y)
+            self.random_trees.append(random_tree)
+    
+    def predict(self, X):
+        res = []
+        mode = np.zeros(X.shape[0])
+        
+        for i in range(self.num_trees):
+            y_pred = self.random_trees[i].predict(X)
+            res.append(y_pred)
+        
+        res = np.array(res).transpose()
+        for i in range(X.shape[0]):
+            mode[i] = utils.mode(res[i, :])
+
+        return mode
+
+            \end{minted}
+        \end{answer}
+        \item Using 50 trees, and a max depth of $\infty$, \ask{report the training and testing error}. Compare this to what we got with a single \texttt{DecisionTree} and with a single \texttt{RandomTree}. \ask{Are the results what you expected? Discuss.} \pts{3}
+        \ans{Using 50 trees, the train error is 0, the testing error is 0.148. The result is better than the single DecisionTree and single RandomTree as expected.}
+        \item \ask{Why does a random forest typically have a training error of 0, even though random trees typically have a training error greater than 0?} \pts{3}
+        \ans{Because we have multipe trees to cover different sets of training data.}
+    \end{enumerate}
+
+
+    \clearpage
+    \section{Clustering \pts{15}}
+
+    If you run \verb|python main.py 5|, it will load a dataset with two features
+    and a very obvious clustering structure. It will then apply the $k$-means algorithm
+    with a random initialization. The result of applying the
+    algorithm will thus depend on the randomization, but a typical run might look like this:
+    \centerfig{.5}{figs/kmeans_basic.png}
+    (Note that the colours are arbitrary -- this is the label switching issue.)
+    But the ``correct'' clustering (that was used to make the data) is this:
+    \centerfig{.5}{figs/kmeans_good.png}
+
+
+    \subsection{Selecting among $k$-means Initializations \pts{7}}
+
+    If you run the demo several times, it will find different clusterings. To select among clusterings for a \emph{fixed} value of $k$, one strategy is to minimize the sum of squared distances between examples $x_i$ and their means $w_{y_i}$,
+    \[
+    f(w_1,w_2,\dots,w_k,y_1,y_2,\dots,y_n) = \sum_{i=1}^n \norm{x_i - w_{y_i}}_2^2 = \sum_{i=1}^n \sum_{j=1}^d (x_{ij} - w_{y_ij})^2.
+    \]
+    where $y_i$ is the index of the closest mean to $x_i$. This is a natural criterion because the steps of $k$-means alternately optimize this objective function in terms of the $w_c$ and the $y_i$ values.
+
+    \begin{enumerate}
+        \item In the \texttt{kmeans.py} file, complete the \texttt{error()} method. \texttt{error()} takes as input the data used in fit (\texttt{X}), the indices of each examples' nearest mean (\texttt{y}), and the current value of means (\texttt{means}). It returns the value of this above objective function. \ask{Submit this code. What trend do you observe if you print the value of this error after each iteration of the $k$-means algorithm?} \pts{4}
+        \begin{answer}
+            The errors keep decreasing
+            \begin{minted}{python}
+    def error(self, X, y, means):
+        error_sum = np.sum(np.square(X - means[y]))
+        return error_sum
+            \end{minted}
+        \end{answer}
+        \item Run $k$-means 50 times (with $k=4$) and take the one with the lowest error. \ask{Report the lowest error obtained.} Visualize the clustering obtained by this model, and \ask{submit your plot}. \pts{3}
+        \begin{answer}
+            The lowest error is 3071.468
+            \centerfig{.5}{figs/kmeans_50_run.png}
+        \end{answer}
+    \end{enumerate}
+
+
+    \subsection{Selecting $k$ in $k$-means \pts{8}}
+
+    We now turn to the task of choosing the number of clusters $k$.
+
+    \begin{enumerate}
+        \item \ask{Explain why we should not choose $k$ by taking the value that minimizes the \texttt{error} value.} \pts{2}
+        \ans{Because the training will always prefer larger k - if every point is a cluster contains only one point, that would result in the smallest error, but it's not we want}
+        \item \ask{Is evaluating the \texttt{error} function on \update{validation (or} test\update{)} data a suitable approach to choosing $k$?} \pts{2}
+        \ans{No, the result is similar to the above question - the largest k, the smallest error}
+        \item \ask{Hand in a plot of the minimum error found across 50 random initializations, as a function of $k$, taking $k$ from $1$ to $10$.} \pts{2}
+        \begin{answer}
+            \centerfig{.7}{figs/k-means-best-k.png}
+        \end{answer}
+        \item The \emph{elbow method} for choosing $k$ consists of looking at the above plot and visually trying to choose the $k$ that makes the sharpest ``elbow" (the biggest change in slope). \ask{What values of $k$ might be reasonable according to this method?} Note: there is not a single correct answer here; it is somewhat open to interpretation and there is a range of reasonable answers. \pts{2}
+        \ans{It's 4 since it has the smallest error}
+    \end{enumerate}
+
+    \clearpage
+    \section{Very-Short Answer Questions \pts{18}}
+
+    \ask{Write a short one or two sentence answer to each of the questions below}. Make sure your answer is clear and concise.
+
+    \begin{enumerate}
+        \item What is a reason that the the data may not be IID in the email spam filtering example from lecture?
+        \begin{answer}
+            The spam emails might be modified later.
+        \end{answer}
+        
+        \item Why can't we (typically) use the training error to select a hyper-parameter?
+        \begin{answer}
+            Because the complex hyper-parameter works better on training data, but that's not what we want
+        \end{answer}
+
+        \item What is the effect of the training or validation set size $n$ on the optimization bias, assuming we use a parametric model?
+        \ans{The larger n, the smaller optimization bias}
+
+        \item What is an advantage and a disadvantage of using a large $k$ value in $k$-fold cross-validation?
+        \ans{Large $k$ means we can train and validate on more data, but it costs more.}
+
+        \item Recall that false positive in binary classification means $\hat y_i=1$ while $\tilde y_i = 0$. Give an example of when increasing false positives is an acceptable risk.
+        \ans{In the email spam classification, the false positive means that we may mark some important emails as spam}
+
+        \item Why can we ignore $p(x_i)$ when we use naive Bayes?
+        \begin{answer}
+            It's the same divider for all possible predictions.
+        \end{answer}
+
+        \item For each of the three values below in a naive Bayes model, say whether it's better considered as a parameter or a hyper-parameter:
+        \begin{enumerate}
+            \item Our estimate of $p(y_i)$ for some $y_i$.
+            \item Our estimate of $p(x_{ij} \mid y_i)$ for some $x_{ij}$ and $y_i$.
+            \item The value $\beta$ in Laplace smoothing.
+        \end{enumerate}
+        \ans{$p(y_i)$ and $p(x_{ij} \mid y_i)$ are parameters, $\beta$ is a hyperparameter}
+
+        \item Both supervised learning and clustering models take in an input $x_i$ and produce a label $y_i$. What is the key difference between these types of models?
+        \ans{Clustering models don't have a $y_i$ in the input }
+
+        \item In $k$-means clustering the clusters are guaranteed to be convex regions. Are the areas that are given the same label by kNN also convex?
+        \ans{No, because it's possible that two points have the same label, but there are other points which have different label between these two points.}
+    \end{enumerate}
+
+\end{document}

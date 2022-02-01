@@ -1,0 +1,52 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{class} \PYG{n+nc}{DecisionStumpErrorRate}\PYG{p}{:}
+    \PYG{n}{y\PYGZus{}hat\PYGZus{}yes} \PYG{o}{=} \PYG{k+kc}{None}
+    \PYG{n}{y\PYGZus{}hat\PYGZus{}no} \PYG{o}{=} \PYG{k+kc}{None}
+    \PYG{n}{j\PYGZus{}best} \PYG{o}{=} \PYG{k+kc}{None}
+    \PYG{n}{t\PYGZus{}best} \PYG{o}{=} \PYG{k+kc}{None}
+
+
+    \PYG{k}{def} \PYG{n+nf}{fit}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{X}\PYG{p}{,} \PYG{n}{y}\PYG{p}{):}
+        \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{y\PYGZus{}hat\PYGZus{}yes} \PYG{o}{=} \PYG{n}{utils}\PYG{o}{.}\PYG{n}{mode}\PYG{p}{(}\PYG{n}{y}\PYG{p}{)}
+        \PYG{n}{minError} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{(}\PYG{n}{y} \PYG{o}{!=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{y\PYGZus{}hat\PYGZus{}yes}\PYG{p}{)}
+        \PYG{n}{n}\PYG{p}{,} \PYG{n}{d} \PYG{o}{=} \PYG{n}{X}\PYG{o}{.}\PYG{n}{shape}
+        \PYG{k}{for} \PYG{n}{j} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{d}\PYG{p}{):}
+            \PYG{n}{thresholds} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{unique}\PYG{p}{(}\PYG{n}{X}\PYG{p}{[:,} \PYG{n}{j}\PYG{p}{])}
+            \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{thresholds}\PYG{p}{)):}
+                \PYG{n}{threshold} \PYG{o}{=} \PYG{n}{thresholds}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]}
+
+                \PYG{c+c1}{\PYGZsh{} Find most likely class for each split}
+                \PYG{n}{y\PYGZus{}yes\PYGZus{}mode} \PYG{o}{=} \PYG{n}{utils}\PYG{o}{.}\PYG{n}{mode}\PYG{p}{(}\PYG{n}{y}\PYG{p}{[}\PYG{n}{X}\PYG{p}{[:,} \PYG{n}{j}\PYG{p}{]} \PYG{o}{\PYGZgt{}} \PYG{n}{threshold}\PYG{p}{])}
+                \PYG{n}{y\PYGZus{}no\PYGZus{}mode} \PYG{o}{=} \PYG{n}{utils}\PYG{o}{.}\PYG{n}{mode}\PYG{p}{(}\PYG{n}{y}\PYG{p}{[}\PYG{n}{X}\PYG{p}{[:,} \PYG{n}{j}\PYG{p}{]} \PYG{o}{\PYGZlt{}=} \PYG{n}{threshold}\PYG{p}{])}
+
+                \PYG{c+c1}{\PYGZsh{} Make prediction}
+                \PYG{n}{y\PYGZus{}pred} \PYG{o}{=} \PYG{n}{y\PYGZus{}yes\PYGZus{}mode} \PYG{o}{*} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ones}\PYG{p}{(}\PYG{n}{n}\PYG{p}{)}
+                \PYG{n}{y\PYGZus{}pred}\PYG{p}{[}\PYG{n}{X}\PYG{p}{[:,} \PYG{n}{j}\PYG{p}{]} \PYG{o}{\PYGZlt{}=} \PYG{n}{threshold}\PYG{p}{]} \PYG{o}{=} \PYG{n}{y\PYGZus{}no\PYGZus{}mode}
+
+                \PYG{c+c1}{\PYGZsh{} Compute errors}
+                \PYG{n}{errors} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sum}\PYG{p}{(}\PYG{n}{y\PYGZus{}pred} \PYG{o}{!=} \PYG{n}{y}\PYG{p}{)}
+
+                \PYG{k}{if} \PYG{n}{errors} \PYG{o}{\PYGZlt{}} \PYG{n}{minError}\PYG{p}{:}
+                    \PYG{c+c1}{\PYGZsh{} This is the lowest error, store this value}
+
+                    \PYG{n}{minError} \PYG{o}{=} \PYG{n}{errors}
+                    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{j\PYGZus{}best} \PYG{o}{=} \PYG{n}{j}
+                    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{t\PYGZus{}best} \PYG{o}{=} \PYG{n}{threshold}
+                    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{y\PYGZus{}hat\PYGZus{}yes} \PYG{o}{=} \PYG{n}{y\PYGZus{}yes\PYGZus{}mode}
+                    \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{y\PYGZus{}hat\PYGZus{}no} \PYG{o}{=} \PYG{n}{y\PYGZus{}no\PYGZus{}mode}
+
+    \PYG{k}{def} \PYG{n+nf}{predict}\PYG{p}{(}\PYG{n+nb+bp}{self}\PYG{p}{,} \PYG{n}{X}\PYG{p}{):}
+        \PYG{n}{n}\PYG{p}{,} \PYG{n}{d} \PYG{o}{=} \PYG{n}{X}\PYG{o}{.}\PYG{n}{shape}
+        \PYG{k}{if} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{j\PYGZus{}best} \PYG{o+ow}{is} \PYG{k+kc}{None}\PYG{p}{:}
+            \PYG{k}{return} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{y\PYGZus{}hat\PYGZus{}yes} \PYG{o}{*} \PYG{n}{np}\PYG{o}{.}\PYG{n}{ones}\PYG{p}{(}\PYG{n}{n}\PYG{p}{)}
+
+        \PYG{n}{y\PYGZus{}hat} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{(}\PYG{n}{n}\PYG{p}{)}
+
+        \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{n}\PYG{p}{):}
+            \PYG{k}{if} \PYG{p}{(}\PYG{n}{X}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{j\PYGZus{}best}\PYG{p}{]} \PYG{o}{\PYGZgt{}} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{t\PYGZus{}best}\PYG{p}{):}
+                \PYG{n}{y\PYGZus{}hat}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{y\PYGZus{}hat\PYGZus{}yes}
+            \PYG{k}{else}\PYG{p}{:}
+                \PYG{n}{y\PYGZus{}hat}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{=} \PYG{n+nb+bp}{self}\PYG{o}{.}\PYG{n}{y\PYGZus{}hat\PYGZus{}no}
+
+        \PYG{k}{return} \PYG{n}{y\PYGZus{}hat}
+\end{Verbatim}
