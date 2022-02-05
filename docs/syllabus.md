@@ -24,13 +24,13 @@ We will roughly cover the following topics:
 
 ## Class meetings
 
-Until Jan 24, we will meet on Zoom 
+Until Feb 7, we will meet on Zoom 
 
 12-1pm Class: https://ubc.zoom.us/j/66268490824?pwd=N1JraUt1VytXZmtYQU1ITUZTaC9GQT09
 
 2-3pm Class:  https://ubc.zoom.us/j/61979299308?pwd=bW5uZGpPV2FaVzViZE9raDFPM3dTdz09
 
-
+From Feb 9, we will meet in the classrooms shown below.
 
 **Lectures**:
 
@@ -38,6 +38,8 @@ Until Jan 24, we will meet on Zoom
 |---------|------|--------|--------|
 | 201  | MWF |12-1pm | 	Friedman Building 153 |  
 | 202  | MWF | 2-3pm | Hugh Dempster Pavilion 301 | 
+
+Panopto links for livestreaming the lectures and recordings after each lecture can be found [here](https://piazza.com/class/ky0odbs6f7424n?cid=186) 
 
 
 **Tutorials**:
